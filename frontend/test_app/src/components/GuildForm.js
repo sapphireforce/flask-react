@@ -1,115 +1,145 @@
-import React, { useState } from 'react';
-import { WORLD_NAMES } from '../constants/enums';
+import {
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import EntityFormDialog from "./EntityFormDialog";
+import { WORLD_NAMES } from "../constants/enums";
 
-function GuildForm({ onCreate }) {
-  const worldOptions = WORLD_NAMES;
-  const [guildName, setGuildName] = useState('');
-  const [guildLevel, setGuildLevel] = useState(1);
-  const [guildFame, setGuildFame] = useState(0);
-  const [guildPoint, setGuildPoint] = useState(0);
-  const [guildMasterName, setGuildMasterName] = useState('');
-  const [guildMemberCount, setGuildMemberCount] = useState(1);
-  const [guildMember, setGuildMember] = useState('');
-  const [worldName, setWorldName] = useState(worldOptions[0]);
+export default function GuildForm({
+  open,
+  isEdit,
+  form,
+  onChange,
+  onClose,
+  onSubmit,
+  characterList = [],
+}) {
+  const memberValue = Array.isArray(form.guild_member)
+    ? form.guild_member
+    : form.guild_member
+    ? form.guild_member
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean)
+    : [];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const members = guildMember.split(',').map(name => name.trim()).filter(Boolean);
-    onCreate({
-      world_name: worldName,
-      guild_name: guildName,
-      guild_level: Number(guildLevel),
-      guild_fame: Number(guildFame),
-      guild_point: Number(guildPoint),
-      guild_master_name: guildMasterName,
-      guild_member_count: Number(guildMemberCount),
-      guild_member: members,
+  const handleMemberChange = (e) => {
+    // Select의 value는 배열
+    onChange({
+      target: {
+        name: "guild_member",
+        value: e.target.value,
+      },
     });
-    setGuildName('');
-    setGuildLevel(1);
-    setGuildFame(0);
-    setGuildPoint(0);
-    setGuildMasterName('');
-    setGuildMemberCount(1);
-    setGuildMember('');
-    setWorldName(worldOptions[0]);
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
-      <select
-        value={worldName}
-        onChange={e => setWorldName(e.target.value)}
+    <EntityFormDialog
+      open={open}
+      title={isEdit ? "길드 수정" : "길드 등록"}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      submitLabel={isEdit ? "저장" : "등록"}
+    >
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>월드</InputLabel>
+        <Select
+          name="world_name"
+          value={form.world_name}
+          onChange={onChange}
+          label="월드"
+          required
+        >
+          {WORLD_NAMES.map((opt) => (
+            <MenuItem key={opt} value={opt}>
+              {opt}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <TextField
+        label="길드명"
+        name="guild_name"
+        value={form.guild_name}
+        onChange={onChange}
+        fullWidth
         required
-        style={{ marginLeft: "10px" }}
-      >
-        {worldOptions.map(opt => (
-          <option key={opt} value={opt}>{opt}</option>
-        ))}
-      </select>
-      <input
-        type="text"
-        placeholder="길드명"
-        value={guildName}
-        onChange={e => setGuildName(e.target.value)}
-        required
-        style={{ marginLeft: "10px", width: "120px" }}
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="레벨"
+        name="guild_level"
         type="number"
-        placeholder="길드 레벨"
-        value={guildLevel}
-        min={1}
-        onChange={e => setGuildLevel(e.target.value)}
+        value={form.guild_level}
+        onChange={onChange}
+        fullWidth
         required
-        style={{ marginLeft: "10px", width: "100px" }}
+        inputProps={{ min: 1 }}
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="명성"
+        name="guild_fame"
         type="number"
-        placeholder="명성"
-        value={guildFame}
-        min={0}
-        onChange={e => setGuildFame(e.target.value)}
+        value={form.guild_fame}
+        onChange={onChange}
+        fullWidth
         required
-        style={{ marginLeft: "10px", width: "100px" }}
+        inputProps={{ min: 0 }}
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="포인트"
+        name="guild_point"
         type="number"
-        placeholder="포인트"
-        value={guildPoint}
-        min={0}
-        onChange={e => setGuildPoint(e.target.value)}
+        value={form.guild_point}
+        onChange={onChange}
+        fullWidth
         required
-        style={{ marginLeft: "10px", width: "100px" }}
+        inputProps={{ min: 0 }}
+        sx={{ mb: 2 }}
       />
-      <input
-        type="text"
-        placeholder="길드장"
-        value={guildMasterName}
-        onChange={e => setGuildMasterName(e.target.value)}
+      <TextField
+        label="길드장"
+        name="guild_master_name"
+        value={form.guild_master_name}
+        onChange={onChange}
+        fullWidth
         required
-        style={{ marginLeft: "10px", width: "120px" }}
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="멤버 수"
+        name="guild_member_count"
         type="number"
-        placeholder="멤버 수"
-        value={guildMemberCount}
-        min={1}
-        onChange={e => setGuildMemberCount(e.target.value)}
+        value={form.guild_member_count}
+        onChange={onChange}
+        fullWidth
         required
-        style={{ marginLeft: "10px", width: "80px" }}
+        inputProps={{ min: 1 }}
+        sx={{ mb: 2 }}
       />
-      <input
-        type="text"
-        placeholder="멤버(쉼표로 구분)"
-        value={guildMember}
-        onChange={e => setGuildMember(e.target.value)}
-        required
-        style={{ marginLeft: "10px", width: "240px" }}
-      />
-      <button type="submit" style={{ marginLeft: "10px" }}>길드 생성</button>
-    </form>
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>멤버</InputLabel>
+        <Select
+          name="guild_member"
+          multiple
+          value={memberValue}
+          onChange={handleMemberChange}
+          label="멤버"
+          required
+          renderValue={(selected) => selected.join(", ")}
+        >
+          {characterList.map((c) => (
+            <MenuItem key={c.character_name} value={c.character_name}>
+              {c.character_name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </EntityFormDialog>
   );
 }
-
-export default GuildForm;
