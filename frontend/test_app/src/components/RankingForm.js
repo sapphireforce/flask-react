@@ -1,40 +1,105 @@
-import React, { useState } from 'react';
+import {
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import EntityFormDialog from "./EntityFormDialog";
 
-function RankingForm({ characters, onCreate }) {
-  const [characterId, setCharacterId] = useState(characters.length > 0 ? characters[0].id : "");
-  const [rankType, setRankType] = useState("total");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!characterId) {
-      alert("캐릭터를 선택하세요.");
-      return;
-    }
-    onCreate({
-      character_id: characterId,
-      rank_type: rankType,
-    });
-    setCharacterId(characters.length > 0 ? characters[0].id : "");
-    setRankType("total");
-  };
-
+export default function RankingForm({
+  open,
+  isEdit,
+  form,
+  onChange,
+  onClose,
+  onSubmit,
+  characterList = [],
+}) {
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: "1rem" }}>
-      <select value={characterId} onChange={e => setCharacterId(e.target.value)} required>
-        <option value="">캐릭터 선택</option>
-        {characters.map(c => (
-          <option key={c.id} value={c.id}>
-            {c.character_name} (Lv.{c.character_level}, {c.world_name})
-          </option>
-        ))}
-      </select>
-      <select value={rankType} onChange={e => setRankType(e.target.value)} style={{ marginLeft: "10px" }}>
-        <option value="total">전체 랭킹</option>
-        <option value="world">월드별</option>
-      </select>
-      <button type="submit" style={{ marginLeft: "10px" }}>랭킹 등록</button>
-    </form>
+    <EntityFormDialog
+      open={open}
+      title={isEdit ? "랭킹 수정" : "랭킹 등록"}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      submitLabel={isEdit ? "저장" : "등록"}
+    >
+      {!isEdit && (
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel>캐릭터</InputLabel>
+          <Select
+            name="character_id"
+            value={form.character_id || ""}
+            onChange={onChange}
+            label="캐릭터"
+            required
+          >
+            {characterList && characterList.length > 0 ? (
+              characterList.map((character) => (
+                <MenuItem key={character.id} value={character.id}>
+                  {character.character_name} (Lv.{character.character_level},{" "}
+                  {character.world_name})
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem value="" disabled>
+                캐릭터가 없습니다
+              </MenuItem>
+            )}
+          </Select>
+        </FormControl>
+      )}
+
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>랭킹 타입</InputLabel>
+        <Select
+          name="rank_type"
+          value={form.rank_type || "total"}
+          onChange={onChange}
+          label="랭킹 타입"
+          required
+        >
+          <MenuItem value="total">전체</MenuItem>
+          <MenuItem value="level">레벨</MenuItem>
+          <MenuItem value="exp">경험치</MenuItem>
+        </Select>
+      </FormControl>
+
+      {isEdit && (
+        <>
+          <TextField
+            label="캐릭터 레벨"
+            name="character_level"
+            type="number"
+            value={form.character_level || ""}
+            onChange={onChange}
+            fullWidth
+            sx={{ mb: 2 }}
+            inputProps={{ min: 1 }}
+          />
+          <TextField
+            label="경험치"
+            name="character_exp"
+            type="number"
+            value={form.character_exp || ""}
+            onChange={onChange}
+            fullWidth
+            sx={{ mb: 2 }}
+            inputProps={{ min: 0 }}
+          />
+        </>
+      )}
+
+      <TextField
+        label="날짜"
+        name="date"
+        type="date"
+        value={form.date || ""}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
+        InputLabelProps={{ shrink: true }}
+      />
+    </EntityFormDialog>
   );
 }
-
-export default RankingForm;

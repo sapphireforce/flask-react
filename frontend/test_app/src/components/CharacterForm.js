@@ -1,131 +1,145 @@
-import React, { useState } from 'react';
-import { WORLD_NAMES, GENDERS, CLASSES } from '../constants/enums';
+import {
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import EntityFormDialog from "./EntityFormDialog";
+import { WORLD_NAMES, GENDERS, CLASSES } from "../constants/enums";
 
-function CharacterForm({ onCreate }) {
-  const [characterName, setCharacterName] = useState('');
-  const [worldName, setWorldName] = useState('아덴');
-  const [characterGender, setCharacterGender] = useState('남');
-  const [characterClass, setCharacterClass] = useState('전사');
-  const [characterClassLevel, setCharacterClassLevel] = useState(1);
-  const [characterLevel, setCharacterLevel] = useState(1);
-  const [characterExp, setCharacterExp] = useState(0);
-  const [characterExpRate, setCharacterExpRate] = useState(0);
-  const [characterGuildName, setCharacterGuildName] = useState('');
-  const [characterImage, setCharacterImage] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onCreate({
-      character_name: characterName,
-      world_name: worldName,
-      character_gender: characterGender,
-      character_class: characterClass,
-      character_class_level: Number(characterClassLevel),
-      character_level: Number(characterLevel),
-      character_exp: Number(characterExp),
-      character_exp_rate: Number(characterExpRate),
-      character_guild_name: characterGuildName,
-      character_image: characterImage,
-    });
-    setCharacterName('');
-    setWorldName('아덴');
-    setCharacterGender('남');
-    setCharacterClass('전사');
-    setCharacterClassLevel(1);
-    setCharacterLevel(1);
-    setCharacterExp(0);
-    setCharacterExpRate(0);
-    setCharacterGuildName('');
-    setCharacterImage('');
-  };
-
+export default function CharacterForm({
+  open,
+  isEdit,
+  form,
+  onChange,
+  onClose,
+  onSubmit,
+}) {
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: "1rem" }}>
-      <input
-        type="text"
-        placeholder="캐릭터 이름"
-        value={characterName}
-        onChange={e => setCharacterName(e.target.value)}
+    <EntityFormDialog
+      open={open}
+      title={isEdit ? "캐릭터 수정" : "캐릭터 등록"}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      submitLabel={isEdit ? "저장" : "등록"}
+    >
+      <TextField
+        label="이름"
+        name="character_name"
+        value={form.character_name}
+        onChange={onChange}
+        fullWidth
         required
+        sx={{ mb: 2 }}
       />
-      <select
-        value={worldName}
-        onChange={e => setWorldName(e.target.value)}
-        required
-        style={{ marginLeft: "10px" }}
-      >
-        {WORLD_NAMES.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-      </select>
-      <select
-        value={characterGender}
-        onChange={e => setCharacterGender(e.target.value)}
-        required
-        style={{ marginLeft: "10px" }}
-      >
-        {GENDERS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-      </select>
-      <select
-        value={characterClass}
-        onChange={e => setCharacterClass(e.target.value)}
-        required
-        style={{ marginLeft: "10px" }}
-      >
-        {CLASSES.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-      </select>
-      <input
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>월드</InputLabel>
+        <Select
+          name="world_name"
+          value={form.world_name}
+          onChange={onChange}
+          label="월드"
+        >
+          {WORLD_NAMES.map((opt) => (
+            <MenuItem key={opt} value={opt}>
+              {opt}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>성별</InputLabel>
+        <Select
+          name="character_gender"
+          value={form.character_gender}
+          onChange={onChange}
+          label="성별"
+        >
+          {GENDERS.map((opt) => (
+            <MenuItem key={opt} value={opt}>
+              {opt}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>직업</InputLabel>
+        <Select
+          name="character_class"
+          value={form.character_class}
+          onChange={onChange}
+          label="직업"
+        >
+          {CLASSES.map((opt) => (
+            <MenuItem key={opt} value={opt}>
+              {opt}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <TextField
+        label="클래스 레벨"
+        name="character_class_level"
         type="number"
-        placeholder="클래스 레벨"
-        value={characterClassLevel}
-        min={1}
-        onChange={e => setCharacterClassLevel(e.target.value)}
-        required
-        style={{ marginLeft: "10px", width: "100px" }}
+        value={form.character_class_level}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="캐릭터 레벨"
+        name="character_level"
         type="number"
-        placeholder="캐릭터 레벨"
-        value={characterLevel}
-        min={1}
-        onChange={e => setCharacterLevel(e.target.value)}
-        required
-        style={{ marginLeft: "10px", width: "100px" }}
+        value={form.character_level}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="경험치"
+        name="character_exp"
         type="number"
-        placeholder="경험치"
-        value={characterExp}
-        min={0}
-        onChange={e => setCharacterExp(e.target.value)}
-        required
-        style={{ marginLeft: "10px", width: "100px" }}
+        value={form.character_exp}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <input
+      <TextField
+        label="경험치율(%)"
+        name="character_exp_rate"
         type="number"
-        placeholder="경험치율(%)"
-        value={characterExpRate}
-        min={0}
-        max={100}
-        onChange={e => setCharacterExpRate(e.target.value)}
-        required
-        style={{ marginLeft: "10px", width: "120px" }}
+        value={form.character_exp_rate}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <input
-        type="text"
-        placeholder="길드명"
-        value={characterGuildName}
-        onChange={e => setCharacterGuildName(e.target.value)}
-        style={{ marginLeft: "10px", width: "120px" }}
+      <TextField
+        label="길드명"
+        name="character_guild_name"
+        value={form.character_guild_name}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <input
-        type="text"
-        placeholder="캐릭터 이미지 URL"
-        value={characterImage}
-        onChange={e => setCharacterImage(e.target.value)}
-        style={{ marginLeft: "10px", width: "200px" }}
+      <TextField
+        label="이미지 URL"
+        name="character_image"
+        value={form.character_image}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <button type="submit" style={{ marginLeft: "10px" }}>캐릭터 생성</button>
-    </form>
+      <TextField
+        label="날짜"
+        name="date"
+        type="date"
+        value={form.date}
+        onChange={onChange}
+        fullWidth
+        sx={{ mb: 2 }}
+        InputLabelProps={{ shrink: true }}
+      />
+    </EntityFormDialog>
   );
 }
-
-export default CharacterForm;
